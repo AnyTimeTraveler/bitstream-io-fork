@@ -13,9 +13,24 @@
 
 use super::BitQueue;
 use super::Endianness;
+
+#[cfg(feature = "no_std")]
+use alloc::{
+    collections::btree_map::BTreeMap,
+    boxed::Box,
+    vec::Vec,
+};
+
+
+#[cfg(feature = "no_std")]
+use no_std_io::error;
+#[cfg(not(feature = "no_std"))]
+use std::error;
+
+#[cfg(not(feature = "no_std"))]
 use std::collections::BTreeMap;
-use std::fmt;
-use std::marker::PhantomData;
+use core::fmt;
+use core::marker::PhantomData;
 
 /// A compiled Huffman tree element for use with the `read_huffman` method.
 /// Returned by `compile_read_tree`.
@@ -57,7 +72,7 @@ pub enum ReadHuffmanTree<E: Endianness, T: Clone> {
 /// ```
 ///
 /// ```
-/// use std::io::{Read, Cursor};
+/// use core::io::{Read, Cursor};
 /// use bitstream_io::{BigEndian, BitReader, HuffmanRead};
 /// use bitstream_io::huffman::compile_read_tree;
 /// let tree = compile_read_tree(
@@ -235,7 +250,7 @@ impl fmt::Display for HuffmanTreeError {
     }
 }
 
-impl std::error::Error for HuffmanTreeError {}
+impl error::Error for HuffmanTreeError {}
 
 /// Given a vector of symbol/code pairs, compiles a Huffman tree
 /// for writing.
@@ -259,7 +274,7 @@ impl std::error::Error for HuffmanTreeError {}
 /// ```
 ///
 /// ```
-/// use std::io::Write;
+/// use core::io::Write;
 /// use bitstream_io::{BigEndian, BitWriter, HuffmanWrite};
 /// use bitstream_io::huffman::compile_write_tree;
 /// let tree = compile_write_tree(
